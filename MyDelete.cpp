@@ -23,6 +23,8 @@ std::vector<boost::filesystem::path> delete_folder( const std::string& dir_path,
         regexs.push_back( boost::regex( "\\\\" + folders_to_remove[i] + "$" ) );
     }
 
+    int cnt = 0;
+
     boost::filesystem::recursive_directory_iterator end_itr; // default construction yields past-the-end
     for ( boost::filesystem::recursive_directory_iterator it( path ); it != end_itr; ++it )
     {
@@ -35,6 +37,7 @@ std::vector<boost::filesystem::path> delete_folder( const std::string& dir_path,
                 if ( boost::regex_search( folder_name, regexs[i] ) )
                 {
                     pathes.push_back( it->path() );
+                    std::cout << "\rfound " << ++cnt << std::flush;
                     break;
                 }
             }
@@ -87,9 +90,7 @@ int _tmain(int argc, _TCHAR* argv[])
     std::string command;
     std::cin >> command;
 
-    boost::algorithm::to_lower(command);
-
-    if ( "y" == command )
+    if ( "y" == boost::algorithm::to_lower_copy(command) )
     {
         for ( size_t i = 0; i < pathes.size(); ++i )
         {
