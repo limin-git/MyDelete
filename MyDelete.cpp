@@ -20,8 +20,10 @@ std::vector<boost::filesystem::path> delete_folder( const std::string& dir_path,
 
     for ( size_t i = 0; i < folders_to_remove.size(); ++i )
     {
-        boost::replace_all( folders_to_remove[i], ".", "\\." );
         boost::replace_all( folders_to_remove[i], "/", "\\" );
+        boost::replace_all( folders_to_remove[i], "\\", "\\\\" );
+        boost::replace_all( folders_to_remove[i], " ", "[ ]" ); // (?x) ×ª»»¿Õ¸ñ
+        boost::replace_all( folders_to_remove[i], ".", "\\." );
         boost::replace_all( folders_to_remove[i], "*", ".*?" );
         regexs.push_back( boost::regex( "(?ix) \\\\" + folders_to_remove[i] + "$" ) );
     }
@@ -51,6 +53,25 @@ std::vector<boost::filesystem::path> delete_folder( const std::string& dir_path,
 }
 
 
+ BOOL remove_attribute( const std::string& file_name, const DWORD attribute = FILE_ATTRIBUTE_READONLY )
+{
+    DWORD dwAttrs = ::GetFileAttributes( file_name.c_str() ); 
+
+    if ( INVALID_FILE_ATTRIBUTES == dwAttrs )
+    {
+        std::cout << "failed to get attribute for " << file_name << std::endl;
+        return FALSE;
+    }
+
+    if ( dwAttrs & attribute ) 
+    {
+        return ::SetFileAttributes( file_name.c_str(), dwAttrs & ~attribute );
+    }
+
+    return TRUE;
+}
+
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     if ( argc < 3 )
@@ -71,7 +92,7 @@ int _tmain(int argc, _TCHAR* argv[])
         folders_to_remove.push_back( argv[i] );
     }
 
-    std::vector<boost::filesystem::path> pathes = delete_folder( argv[1], folders_to_remove );
+    const std::vector<boost::filesystem::path>& pathes = delete_folder( argv[1], folders_to_remove );
 
     if ( pathes.empty() )
     {
@@ -93,7 +114,7 @@ int _tmain(int argc, _TCHAR* argv[])
                 boost::filesystem::recursive_directory_iterator end_itr; // default construction yields past-the-end
                 for ( boost::filesystem::recursive_directory_iterator it( pathes[i] ); it != end_itr; ++it )
                 {
-                    ::SetFileAttributes( it->path().string().c_str(), FILE_ATTRIBUTE_NORMAL );
+                    remove_attribute( it->path().string(), FILE_ATTRIBUTE_READONLY );
                 }
 
                 boost::system::error_code ec;
@@ -101,11 +122,11 @@ int _tmain(int argc, _TCHAR* argv[])
 
                 if ( ec )
                 {
-                    std::cout << ec.message() << std::endl;
-                }       
+                    std::cout << pathes[i].string() << ": " << ec.message() << std::endl;
+                }
             }
         }
     }
 
-	return 0;
+    return 0;
 }
