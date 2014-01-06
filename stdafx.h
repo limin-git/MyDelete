@@ -18,10 +18,12 @@
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <map>
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 

@@ -4,7 +4,7 @@
 #include "stdafx.h"
 
 
-std::vector<boost::filesystem::path> delete_folder( const std::string& dir_path, const std::vector<std::string>& folders_to_remove )
+std::vector<boost::filesystem::path> delete_folder( const std::string& dir_path, std::vector<std::string>& folders_to_remove )
 {
     std::vector<boost::filesystem::path> pathes;
 
@@ -20,7 +20,10 @@ std::vector<boost::filesystem::path> delete_folder( const std::string& dir_path,
 
     for ( size_t i = 0; i < folders_to_remove.size(); ++i )
     {
-        regexs.push_back( boost::regex( "\\\\" + folders_to_remove[i] + "$" ) );
+        boost::replace_all( folders_to_remove[i], ".", "\\." );
+        boost::replace_all( folders_to_remove[i], "/", "\\" );
+        boost::replace_all( folders_to_remove[i], "*", ".*?" );
+        regexs.push_back( boost::regex( "(?ix) \\\\" + folders_to_remove[i] + "$" ) );
     }
 
     int cnt = 0;
@@ -37,7 +40,7 @@ std::vector<boost::filesystem::path> delete_folder( const std::string& dir_path,
                 if ( boost::regex_search( folder_name, regexs[i] ) )
                 {
                     pathes.push_back( it->path() );
-                    std::cout << "\rfound " << ++cnt << std::flush;
+                    std::cout << std::setw(3) << std::setfill('0') << ++cnt << ": " << it->path().string() << std::endl;
                     break;
                 }
             }
@@ -74,15 +77,6 @@ int _tmain(int argc, _TCHAR* argv[])
     {
         std::cout << "folder not found" << std::endl;
         return 0;
-    }
-
-    ::system( "cls" );
-
-    std::cout << "folders to be deleted: " << std::endl;
-
-    for ( size_t i = 0; i < pathes.size(); ++i )
-    {
-        std::cout << pathes[i].string() << std::endl;
     }
 
     std::cout << "are you sure(y/n): ";
