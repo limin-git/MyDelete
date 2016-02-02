@@ -45,6 +45,7 @@ std::vector<boost::filesystem::path> find_folders( const std::string& dir_path, 
     const std::vector<boost::regex>& regexs = build_regexs( folders_to_remove );
 
     int cnt = 0;
+    int print_cnt = 0;
 
     boost::filesystem::recursive_directory_iterator end_itr; // default construction yields past-the-end
     for ( boost::filesystem::recursive_directory_iterator it( path ); it != end_itr; ++it )
@@ -53,7 +54,10 @@ std::vector<boost::filesystem::path> find_folders( const std::string& dir_path, 
         {
             const std::string& folder_name = it->path().string();
 
-            std::cout << LINE_BEGIN << folder_name << std::flush;
+            if ( print_cnt++ % 5 == 0 )
+            {
+                std::cout << LINE_BEGIN << folder_name << std::flush;
+            }
 
             for ( size_t i = 0; i < regexs.size(); ++i )
             {
@@ -116,16 +120,16 @@ int _tmain(int argc, _TCHAR* argv[])
 
     if ( pathes.empty() )
     {
-        std::cout << "folder not found" << std::endl;
+        std::cout << LINE_BEGIN << "folder not found" << std::endl;
         return 0;
     }
 
-    std::cout << LINE_BEGIN << "are you sure(y/n): ";
+    std::cout << LINE_BEGIN << "are you sure('yes'): ";
 
     std::string command;
     std::cin >> command;
 
-    if ( "y" == boost::algorithm::to_lower_copy(command) )
+    if ( "yes" == boost::algorithm::to_lower_copy(command) )
     {
         for ( size_t i = 0; i < pathes.size(); ++i )
         {
@@ -140,7 +144,7 @@ int _tmain(int argc, _TCHAR* argv[])
                 boost::system::error_code ec;
                 boost::filesystem::remove_all( pathes[i], ec );
 
-                if ( ec && i % 5 == 0 )
+                if ( ec )
                 {
                     std::cout << pathes[i].string() << ": " << ec.message() << std::endl;
                 }
