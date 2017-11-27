@@ -19,6 +19,8 @@
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
 #include <map>
 #include <string>
 #include <fstream>
@@ -26,4 +28,3 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
-
