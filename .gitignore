@@ -1,9 +1,12 @@
 Debug/
+Release/
 /.parasoft.dat/
 /bin/
 /daemon/
 /examples/
 /wwwfiles/
+.vs/
+Backup*/
 *.exe
 *.o
 *.pdb

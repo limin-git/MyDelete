@@ -17,8 +17,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string.hpp>
 #include <map>
 #include <string>
 #include <fstream>
