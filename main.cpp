@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 
+<<<<<<< HEAD
 
 const char* LINE_BEGIN = "\r                                                                                                                        \r";
 
@@ -32,6 +33,24 @@ std::vector<boost::regex> build_regexs(const std::vector<std::string>& folder_na
         }
 
         regexs.push_back(boost::regex("(?ix) \\\\" + name + "$"));
+=======
+std::vector<boost::regex> build_regexs( const std::vector<std::string>& folder_names )
+{
+    std::vector<boost::regex> regexs;
+    std::vector<std::string> folders = folder_names;
+
+    BOOST_FOREACH(std::string& folder, folders)
+    {
+        boost::replace_all( folder, "/", "\\" );
+        boost::replace_all( folder, "\\", "\\\\" );
+        boost::replace_all( folder, " ", "[ ]" ); // (?x) ×ª»»¿Õ¸ñ
+        boost::replace_all( folder, "(", "\\(" );
+        boost::replace_all( folder, ")", "\\)" );
+        boost::replace_all( folder, ".", "\\." );
+        boost::replace_all( folder, "*", ".*?" );
+        boost::replace_all( folder, "?", "." );
+        regexs.push_back( boost::regex( "(?ix) \\\\" + folder + "$" ) );
+>>>>>>> ab17732cd395e222a4f2374feecaf6022075f169
     }
 
     return regexs;
@@ -52,12 +71,12 @@ std::vector<boost::filesystem::path> find_folders(const std::string& dir_path, s
     const std::vector<boost::regex>& regexs = build_regexs(folders_to_remove);
 
     int cnt = 0;
-    int print_cnt = 0;
 
     boost::filesystem::recursive_directory_iterator end_itr; // default construction yields past-the-end
 
     for (boost::filesystem::recursive_directory_iterator it(path); it != end_itr; ++it)
     {
+<<<<<<< HEAD
         if (true == boost::filesystem::is_directory(it->status()))
         {
             const std::string& folder_name = it->path().string();
@@ -70,11 +89,19 @@ std::vector<boost::filesystem::path> find_folders(const std::string& dir_path, s
             for (size_t i = 0; i < regexs.size(); ++i)
             {
                 if (boost::regex_search(folder_name, regexs[i]))
+=======
+        if ( boost::filesystem::is_directory( it->status() ) )
+        {
+            const std::string& folder_name = it->path().string();
+
+            BOOST_FOREACH(const boost::regex& regex, regexs)
+            {
+                if ( boost::regex_search( folder_name, regex ) )
+>>>>>>> ab17732cd395e222a4f2374feecaf6022075f169
                 {
                     pathes.push_back(it->path());
                     it.no_push();
-
-                    std::cout << LINE_BEGIN << std::setw(3) << std::setfill('0') << ++cnt << ": " << folder_name << std::endl;
+                    std::cout << std::setw(3) << std::setfill('0') << ++cnt << ": " << folder_name << std::endl;
                     break;
                 }
             }
@@ -115,6 +142,7 @@ int _tmain(int argc, _TCHAR* argv[])
         return 0;
     }
 
+<<<<<<< HEAD
     std::vector<std::string> folders_to_remove;
 
     for (int i = 2; i < argc; ++i)
@@ -123,19 +151,28 @@ int _tmain(int argc, _TCHAR* argv[])
     }
 
     const std::vector<boost::filesystem::path>& pathes = find_folders(argv[1], folders_to_remove);
+=======
+    std::vector<std::string> folders_to_remove(argv + 2, argv + argc);
+    const std::vector<boost::filesystem::path>& pathes = find_folders( argv[1], folders_to_remove );
+>>>>>>> ab17732cd395e222a4f2374feecaf6022075f169
 
     if (pathes.empty())
     {
-        std::cout << LINE_BEGIN << "folder not found" << std::endl;
+        system("cls");
+        std::cout << "folder not found" << std::endl;
         return 0;
     }
 
-    std::cout << LINE_BEGIN << "are you sure('yes'): ";
+    std::cout << "type 'yes' for delete: ";
 
     std::string command;
     std::cin >> command;
 
+<<<<<<< HEAD
     if (boost::iequals("yes", command))
+=======
+    if ( boost::iequals(command, "yes") )
+>>>>>>> ab17732cd395e222a4f2374feecaf6022075f169
     {
         for (size_t i = 0; i < pathes.size(); ++i)
         {
