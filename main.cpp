@@ -76,14 +76,14 @@ std::vector<boost::filesystem::path> find_folders(const std::string& dir_path, s
 }
 
 
-BOOL remove_attribute(const std::string& file_name, const DWORD attribute = FILE_ATTRIBUTE_READONLY)
+bool remove_attribute(const std::string& file_name, const DWORD attribute = FILE_ATTRIBUTE_READONLY)
 {
     DWORD dwAttrs = ::GetFileAttributes(file_name.c_str());
 
     if (INVALID_FILE_ATTRIBUTES == dwAttrs)
     {
         std::cout << "failed to get attribute for " << file_name << std::endl;
-        return FALSE;
+        return false;
     }
 
     if (dwAttrs & attribute)
@@ -91,7 +91,7 @@ BOOL remove_attribute(const std::string& file_name, const DWORD attribute = FILE
         return ::SetFileAttributes(file_name.c_str(), dwAttrs & ~attribute);
     }
 
-    return TRUE;
+    return true;
 }
 
 
