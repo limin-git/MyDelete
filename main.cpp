@@ -5,23 +5,26 @@
 
 const char* LINE_BEGIN = "\r                                                                                                                        \r";
 
-std::vector<boost::regex> build_regexs(const std::vector<std::string>& folder_names)
+std::vector<boost::regex> build_regexs(const std::vector<boost::filesystem::path>& folder_names)
 {
     std::vector<boost::regex> regexs;
-    std::vector<std::string>& names = const_cast< std::vector<std::string>& >(folder_names);
 
-    for (std::string& name : names)
+    for (const boost::filesystem::path& folder : folder_names)
     {
+        std::string name = folder.string();
         static const std::vector<std::pair<const char*, const char*>> items =
         {
-            {"/", "\\" },
-            {"\\", "\\\\" },
-            {" ", "[ ]" }, // (?x) ×ª»»¿Õ¸ñ
-            {"(", "\\(" },
-            {")", "\\)" },
-            {".", "\\." },
-            {"*", ".*?" },
-            {"?", "." }
+            { "/", "\\" },
+            { "\\", "\\\\" },
+            { " ", "[ ]" },
+            { "(", "\\(" }, { ")", "\\)" },
+            { "[", "\\[" }, { "]", "\\]" },
+            { "{", "\\{" }, { "}", "\\}" },
+            { ".", "\\." },
+            { "*", ".*?" },
+            { "?", "." },
+            { "^", "\\^" },
+            { "$", "\\$" },
         };
 
         for (auto pair : items)
@@ -36,14 +39,14 @@ std::vector<boost::regex> build_regexs(const std::vector<std::string>& folder_na
 }
 
 
-std::vector<boost::filesystem::path> find_folders(const std::string& dir_path, std::vector<std::string>& folders_to_remove)
+std::vector<boost::filesystem::path> find_folders(const boost::filesystem::path& dir_path, std::vector<boost::filesystem::path>& folders_to_remove)
 {
     std::vector<boost::filesystem::path> pathes;
     boost::filesystem::path path(dir_path);
 
-    if (!exists(path))
+    if (!exists(dir_path))
     {
-        std::cout << "error: " << dir_path << " does not exist." << std::endl;
+        std::cout << "error: " << dir_path.string() << " does not exist." << std::endl;
         return pathes;
     }
 
@@ -106,7 +109,7 @@ int _tmain(int argc, _TCHAR* argv[])
         return 0;
     }
 
-    std::vector<std::string> folders_to_remove(argv + 2, argv + argc);
+    std::vector<boost::filesystem::path> folders_to_remove(argv + 2, argv + argc);
     const std::vector<boost::filesystem::path>& pathes = find_folders(argv[1], folders_to_remove);
 
     if (pathes.empty())
